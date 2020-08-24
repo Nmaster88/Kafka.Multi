@@ -6,6 +6,7 @@ using Confluent.Kafka;
 using ProducerApp.Dtos;
 using System.Text.Json;
 using System.Collections.Generic;
+using ProducerApp.Types;
 
 namespace ProducerApp
 {
@@ -89,8 +90,6 @@ namespace ProducerApp
             // Create the producer
             using (var producer = new ProducerBuilder<long, string>(config).Build())
             {
-
-
                 Console.WriteLine("\n-----------------------------------------------------------------------");
                 Console.WriteLine($"Producer {producer.Name} producing on topic {kafkaTopic}.");
                 Console.WriteLine("-----------------------------------------------------------------------");
@@ -222,8 +221,31 @@ namespace ProducerApp
             //Modes of the producer
             //single - each line is write in the console
             //multi - produces a lot of messages
-            //var mode = args[0];
-            var mode = "multi";
+            string mode = "";
+            if(args == null || args.Length == 0)
+            {
+                mode = ProducerTypes.multi.ToString();
+            }
+            else
+            {
+                ProducerTypes producerType;
+                if(Enum.TryParse(args[0], out producerType))
+                {
+                    if(Enum.IsDefined(typeof(ProducerTypes),producerType) | producerType.ToString().Contains(","))
+                    {
+                        mode = producerType.ToString();
+                    }
+                    else
+                    {
+                        Console.WriteLine("The producer type passed as argument doesn't exits. mode defaults to multi");
+                        mode = ProducerTypes.multi.ToString();
+                    }
+                }
+                else
+                {
+                    mode = ProducerTypes.multi.ToString();
+                }
+            }
 
             // The Kafka endpoint address
             string kafkaEndpoint = "127.0.0.1:9092";

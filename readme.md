@@ -20,11 +20,11 @@ How to run docker with postgreSQL, Zookeeper and kafka
 
 Generate ProducerApp messages
 > cd Kafka/ProducerApp
-> dotnet run Program.cs
+> dotnet run
 
 Consume messages in ConsumerApp
 > cd Kafka/ConsumerApp
-> dotnet run Program.cs
+> dotnet run
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
