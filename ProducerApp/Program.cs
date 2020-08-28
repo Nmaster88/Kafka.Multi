@@ -7,12 +7,12 @@ using ProducerApp.Dtos;
 using System.Text.Json;
 using System.Collections.Generic;
 using ProducerApp.Types;
+using NDesk.Options;
 
 namespace ProducerApp
 {
     class Program
     {
-
         public static async Task Run_Single(ProducerConfig config, string kafkaTopic)
         {
             // Create the producer
@@ -216,20 +216,61 @@ namespace ProducerApp
             }
         }
 
+        static void ShowHelp (OptionSet p)
+        {
+            Console.WriteLine ("Options:");
+            p.WriteOptionDescriptions (Console.Out);
+        }
+
         public static async Task Main(string[] args)
         {
+            #region " options passed as arguments "
+            bool show_help = false;
+            bool show_version = false;
+            string mode = "";
+
+            var p = new OptionSet () {
+                { "v|version", "The version of kafka producer test application.",
+                v => show_version = v != null },
+                { "m|mode=", "Choose the mode that this application will use. It can be Single or Multi.",
+                v => mode = v },
+                { "h|help",  "Show this message and exit", 
+                v => show_help = v != null },
+            };
+
+            try {
+                p.Parse (args);
+            }
+            catch (OptionException e) {
+                Console.Write ("kafka: ");
+                Console.WriteLine (e.Message);
+                Console.WriteLine ("Try `--help' for more information.");
+                return;
+            }
+
+            if (show_help) {
+                ShowHelp (p);
+                return;
+            }
+
+            if (show_version) {
+                Console.WriteLine ("Version 1.0.0 for producer and consumer test application of Kafka confluent.");
+                return;
+            }
+
+            #endregion
+
             //Modes of the producer
             //single - each line is write in the console
             //multi - produces a lot of messages
-            string mode = "";
-            if(args == null || args.Length == 0)
+            if(String.IsNullOrEmpty(mode))
             {
                 mode = ProducerTypes.multi.ToString();
             }
             else
             {
                 ProducerTypes producerType;
-                if(Enum.TryParse(args[0], out producerType))
+                if(Enum.TryParse(mode, out producerType))
                 {
                     if(Enum.IsDefined(typeof(ProducerTypes),producerType) | producerType.ToString().Contains(","))
                     {

@@ -12,6 +12,12 @@ https://docs.docker.com/get-docker/
 For the consumerApp, the database postgreSQL is needed
 https://www.postgresql.org/
 
+## Libraries
+
+NDesk.Options
+http://www.ndesk.org/doc/ndesk-options/NDesk.Options/OptionSet.html#M:NDesk.Options.OptionSet.WriteOptionDescriptions(System.IO.TextWriter)
+For the command line functionality NDesk option was used, on the link can be found an example of usage.
+
 ## Usage
 
 How to run docker with postgreSQL, Zookeeper and kafka
