@@ -173,17 +173,6 @@ namespace ProducerApp
                     await producer.ProduceAsync(
                         kafkaTopic, new Message<long, string> { Key = newMessage.Id, Value = serializedNewMessage });
                     countMessages++;
-                    // if (i < start + 40000)
-                    // {
-                    //     //update message
-                    //     ChannelMessagesJson updateMessage = new ChannelMessagesJson()
-                    //     {
-                    //         Id = (long)generator.NextLong(),
-                    //         ReceivedTimestamp = DateTimeNow,
-                    //         MessageEventId = newMessage.Id
-                    //     };
-                    //     ackMessages.Add(updateMessage);
-                    // }
 
                 }
 
@@ -200,14 +189,6 @@ namespace ProducerApp
                         kafkaTopic, new Message<long, string> { Key = updateMessage.Id, Value = serializedUpdateMessage });
                     countMessages++;
                 }
-                //To send the ack messages only after the created messages
-                // foreach (var ackMessage in ackMessages)
-                // {
-                //     var serializedUpdateMessage = JsonSerializer.Serialize(ackMessage);
-                //     await producer.ProduceAsync(
-                //         kafkaTopic, new Message<long, string> { Key = ackMessage.Id, Value = serializedUpdateMessage });
-                //     countMessages++;
-                // }
 
                 producer.Flush();
                 sw.Stop();
@@ -224,6 +205,17 @@ namespace ProducerApp
 
         public static async Task Main(string[] args)
         {
+            #region " kafka configuration "
+                // The Kafka endpoint address
+                string kafkaEndpoint = "127.0.0.1:9092";
+
+                // The Kafka topic we'll be using
+                string kafkaTopic = "new-message-topic";
+
+                // Create the producer configuration
+                var config = new ProducerConfig { BootstrapServers = kafkaEndpoint, EnableDeliveryReports = false, QueueBufferingMaxMessages = 200000 };
+            #endregion
+
             #region " options passed as arguments "
             bool show_help = false;
             bool show_version = false;
@@ -288,14 +280,6 @@ namespace ProducerApp
                 }
             }
 
-            // The Kafka endpoint address
-            string kafkaEndpoint = "127.0.0.1:9092";
-
-            // The Kafka topic we'll be using
-            string kafkaTopic = "new-message-topic";
-
-            // Create the producer configuration
-            var config = new ProducerConfig { BootstrapServers = kafkaEndpoint, EnableDeliveryReports = false, QueueBufferingMaxMessages = 200000 };
 
             switch (mode)
             {
