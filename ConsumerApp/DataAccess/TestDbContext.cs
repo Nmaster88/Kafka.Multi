@@ -10,7 +10,6 @@ namespace ConsumerApp.DataAccess.TestDb
         public DbSet<TopicMessagesJson> messagesJson { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            //builder.Entity<TopicMessages>().HasKey(m => m.Id);
             builder.Entity<TopicMessagesJson>().HasKey(m => m.id);
             base.OnModelCreating(builder);
         }
