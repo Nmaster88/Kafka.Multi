@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Confluent.Kafka;
 using ConsumerApp.Dtos;
-using ConsumerApp.Models;
 using Npgsql;
-using NpgsqlTypes;
+using Dapper.Contrib.Extensions;
 
 namespace ConsumerApp.DataAccess
 {
@@ -175,7 +173,6 @@ namespace ConsumerApp.DataAccess
             return true;
         }
 
-
         public bool InsertJsonBatchDesirializedIntoTableOpt(BatchResult<long, ChannelMessagesJson> result)
         {
             var valuesTableSql = string.Join(",", Enumerable.Range(0, result.Messages.Count).Select(i => $"(@p1{i}, @p2{i} :: jsonb )"));
@@ -229,6 +226,61 @@ namespace ConsumerApp.DataAccess
             return true;
         }
 
+        //TODO in development dapper insert
+        public bool InsertJsonBatchDesirializedIntoTableDapper(BatchResult<long, ChannelMessagesJson> result)
+        {
+            var valuesTableSql = string.Join(",", Enumerable.Range(0, result.Messages.Count).Select(i => $"(@p1{i}, @p2{i} :: jsonb )"));
+            var options = new JsonSerializerOptions
+            {
+                AllowTrailingCommas = true
+            };
+            if (result.Messages.Count > 0)
+            {
+                //To get from the batch all new messages key, to query the database
+                var queryIds = result.Messages.Where(me => me.Value.MessageEventId != 0).Select(me => me.Value.MessageEventId).ToList();
+                List<Message<long, string>> values = new List<Message<long, string>>();
+                if (queryIds.Count() != 0)
+                {
+                    values = SelectResultsFromTableString(queryIds);
+                }
+
+                for(int i = 0; i < result.Messages.Count; ++i)
+                {
+                    var deserializedMessage = result.Messages.ElementAt(i).Value;
+                    if (deserializedMessage.MessageEventId != 0)
+                    {
+                        Message<long, string> Content = values.FirstOrDefault(m => m.Key == deserializedMessage.MessageEventId);
+                        if (Content == null)
+                        {
+                            //In this rare event, it means the acknowledge is probably on the same batch as the created event
+                            var ContentBatch = result.Messages.FirstOrDefault(m => m.Key == deserializedMessage.MessageEventId);
+                        }
+                        conn.Insert<NewMessageJson>(new NewMessageJson(){
+                            id = deserializedMessage.MessageEventId,
+                            content = Content.Value,
+                            status = "acknowledged",
+                            isreceived = true,
+                            receivedtimestamp = deserializedMessage.ReceivedTimestamp
+                        });
+                        //cmd.Parameters.AddWithValue($"p2{i}", $"{{ \"id\":{deserializedMessage.MessageEventId}, \"content\": \"{Content.Value}\" ,\"status\":\"acknowledged\", \"isreceived\":true,\"receivedtimestamp\":\"{deserializedMessage.ReceivedTimestamp}\"}}");
+
+                    }
+                    else
+                    {
+                        conn.Insert<NewMessageJson>(new NewMessageJson(){
+                            id = deserializedMessage.MessageEventId,
+                            content = deserializedMessage.Content,
+                            status = "new",
+                            created = deserializedMessage.Created
+                        });
+                        //cmd.Parameters.AddWithValue($"p2{i}", $"{{ \"id\":{deserializedMessage.Id}, \"content\": \"{deserializedMessage.Content}\" ,\"status\":\"new\",\"created\":\"{deserializedMessage.Created}\"}}");
+                    }
+                }
+            }
+
+            return true;
+        }
+
         public class NewMessageJson
         {
             public long id { get; set; }
@@ -237,7 +289,11 @@ namespace ConsumerApp.DataAccess
 
             public string status { get; set; }
 
-            public DateTime Created { get; set; }
+            public bool isreceived { get; set; }
+
+            public DateTime? created { get; set; }
+
+            public DateTime? receivedtimestamp { get; set; }
         }
 
         public List<Message<long, ChannelMessagesJson>> SelectResultsFromTable(IEnumerable<long> ids)

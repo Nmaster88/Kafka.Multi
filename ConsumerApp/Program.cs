@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using Confluent.Kafka;
-using System.Linq;
-using ConsumerApp.DataAccess.TestDb;
-using ConsumerApp.Models;
-using System.Diagnostics;
-using Npgsql;
-using ConsumerApp.DataAccess;
-using ConsumerApp.Dtos;
 using ConsumerApp.Types;
 using ConsumerApp.Services;
 
@@ -391,11 +384,7 @@ namespace ConsumerApp
             else if(mode == ConsumerTypes.manual.ToString())
             {
                 consumer = new ManualConsumer();
-            } 
-            else if(mode == ConsumerTypes.EntityFramework.ToString())
-            {
-                consumer = new EntityFrameworkConsumer();
-            } 
+            }  
             else if(mode == ConsumerTypes.Database.ToString())
             {
                 consumer = new DatabaseConsumer();
