@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Confluent.Kafka;
+using ConsumerApp.DataAccess.TestDb;
 using ConsumerApp.Interfaces;
+using ConsumerApp.Models;
 
 namespace ConsumerApp.Services
 {

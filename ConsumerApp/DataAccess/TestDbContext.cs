@@ -1,4 +1,3 @@
-using ConsumerApp;
 using ConsumerApp.Models;
 using Microsoft.EntityFrameworkCore;
 namespace ConsumerApp.DataAccess.TestDb
