@@ -53,6 +53,16 @@ namespace ConsumerApp.Services
                     {
                         try
                         {
+                            var consumeResult = consumer.Consume(cancellationToken);
+
+                            if (consumeResult.IsPartitionEOF)
+                            {
+                                Console.WriteLine(
+                                    $"Reached end of topic {consumeResult.Topic}, partition {consumeResult.Partition}, offset {consumeResult.Offset}.");
+
+                                continue;
+                            }
+
                             var result = consumer.ConsumeBatchDesirialize<long, ChannelMessagesJson>(1000, 50);
                             if (result.Messages.Count > 0)
                             {
