@@ -4,6 +4,7 @@ namespace ConsumerApp.Types
         single,
         manual,
         Database,
-        EntityFramework
+        EntityFramework,
+        Dapper
     }
 }

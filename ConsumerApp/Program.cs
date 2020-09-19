@@ -389,7 +389,11 @@ namespace ConsumerApp
             {
                 consumer = new DatabaseConsumer();
             } 
-            else
+            else if(mode == ConsumerTypes.Dapper.ToString())
+            {
+                consumer = new DatabaseDapperConsumer();
+            } 
+            else 
             {
                 consumer = new DatabaseConsumer();
             }
