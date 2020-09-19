@@ -209,8 +209,12 @@ namespace ConsumerApp.DataAccess
                             {
                                 //In this rare event, it means the acknowledge is probably on the same batch as the created event
                                 var ContentBatch = result.Messages.FirstOrDefault(m => m.Key == deserializedMessage.MessageEventId);
+                                cmd.Parameters.AddWithValue($"p2{i}", $"{{ \"id\":{deserializedMessage.MessageEventId}, \"content\": \"{ContentBatch.Value}\" ,\"status\":\"acknowledged\", \"isreceived\":true,\"receivedtimestamp\":\"{deserializedMessage.ReceivedTimestamp}\"}}");
                             }
-                            cmd.Parameters.AddWithValue($"p2{i}", $"{{ \"id\":{deserializedMessage.MessageEventId}, \"content\": \"{Content.Value}\" ,\"status\":\"acknowledged\", \"isreceived\":true,\"receivedtimestamp\":\"{deserializedMessage.ReceivedTimestamp}\"}}");
+                            else
+                            {
+                                cmd.Parameters.AddWithValue($"p2{i}", $"{{ \"id\":{deserializedMessage.MessageEventId}, \"content\": \"{Content.Value}\" ,\"status\":\"acknowledged\", \"isreceived\":true,\"receivedtimestamp\":\"{deserializedMessage.ReceivedTimestamp}\"}}");
+                            }
                         }
                         else
                         {
