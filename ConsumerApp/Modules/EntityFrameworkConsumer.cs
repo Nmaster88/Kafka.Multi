@@ -7,7 +7,7 @@ using Confluent.Kafka;
 using ConsumerApp.Interfaces;
 using Npgsql;
 
-namespace ConsumerApp.Services
+namespace ConsumerApp.Modules
 {
     public class EntityFrameworkConsumer : Consumer
     {

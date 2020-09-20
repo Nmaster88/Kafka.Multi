@@ -8,7 +8,7 @@ using ConsumerApp.DataAccess.TestDb;
 using ConsumerApp.Interfaces;
 using ConsumerApp.Models;
 
-namespace ConsumerApp.Services
+namespace ConsumerApp.Modules
 {
     public class ManualConsumer : Consumer
     {

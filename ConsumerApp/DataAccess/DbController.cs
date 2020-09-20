@@ -30,7 +30,7 @@ namespace ConsumerApp.DataAccess
 
         bool InsertJsonBatchDesirializedIntoTableOpt(BatchResult<long, ChannelMessagesJson> result);
     }
-    public class PostgresDbController : DbController
+    public class PostgreDbControllerOLD : DbController
     {
         string connString = Utility.GetConnectionString("ConnectionStrings:DefaultConnection");
 

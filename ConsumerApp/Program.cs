@@ -10,7 +10,7 @@ using Npgsql;
 using ConsumerApp.DataAccess;
 using ConsumerApp.Dtos;
 using ConsumerApp.Types;
-using ConsumerApp.Services;
+using ConsumerApp.Modules;
 
 namespace ConsumerApp
 {
@@ -398,11 +398,11 @@ namespace ConsumerApp
             } 
             else if(mode == ConsumerTypes.Database.ToString())
             {
-                consumer = new DatabaseConsumer();
+                consumer = new PostgreDbConsumer();
             } 
             else
             {
-                consumer = new DatabaseConsumer();
+                consumer = new PostgreDbConsumer();
             }
 
             CancellationTokenSource cts = new CancellationTokenSource();

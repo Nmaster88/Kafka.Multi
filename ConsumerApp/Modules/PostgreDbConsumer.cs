@@ -8,25 +8,19 @@ using ConsumerApp.DataAccess;
 using ConsumerApp.Dtos;
 using ConsumerApp.Interfaces;
 
-namespace ConsumerApp.Services
+namespace ConsumerApp.Modules
 {
-    public class DatabaseConsumer : Consumer
+    public class PostgreDbConsumer : Consumer
     {
-        public override void Run(string brokerList, List<string> topics, CancellationToken cancellationToken){
+        public override void Run(string brokerList, List<string> topics, CancellationToken cancellationToken)
+        {
             //TODO: create the table for messages_Json here
-            PostgresDbController postgresDb = new PostgresDbController();
-            DbController db = postgresDb;
+            //PostgresDbContext postgresDb = new PostgresDbContext();
+            //IDbContext db = postgresDb;
 
-            db.Initialize();
-
-            db.OpenConn();
-
-            db.CreateDbIfnotExists();
-
-            if (db.CreateTableIfNotExists("TopicMessages"))
-            {
-                Console.WriteLine("table created");
-            }
+            var DbContext = new DbContextStrategy();
+            DbContext.SetStrategy(new PostgresDbContext());
+            DbContext.CreateDatabaseIfNotExist();
 
             var config = new ConsumerConfig
             {
@@ -41,6 +35,11 @@ namespace ConsumerApp.Services
             };
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
+            DbContext.OpenConnection();
+
+
+
             using (var consumer =
                 new ConsumerBuilder<long, string>(config)
                     .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
@@ -49,6 +48,8 @@ namespace ConsumerApp.Services
                 consumer.Assign(topics.Select(topic => new TopicPartitionOffset(topic, 0, Offset.Beginning)).ToList());
                 try
                 {
+                    //TODO improve this to use stategy pattern
+                    ITableContext _tableContext = new TopicMessagesJsonContext(DbContext._dbContext);
                     while (true)
                     {
                         try
@@ -62,13 +63,13 @@ namespace ConsumerApp.Services
 
                                 continue;
                             }
-                            
+
                             var result = consumer.ConsumeBatchDesirialize<long, ChannelMessagesJson>(1000, 50);
                             if (result.Messages.Count > 0)
                             {
                                 var swsql = new Stopwatch();
                                 swsql.Start();
-                                db.InsertJsonBatchDesirializedIntoTableOpt(result);
+                                _tableContext.InsertJsonBatchDesirializedIntoTable(result);
                                 swsql.Stop();
                                 Console.WriteLine($"swsql batch: {swsql.ElapsedMilliseconds}");
                             }
@@ -93,7 +94,7 @@ namespace ConsumerApp.Services
             sw.Stop();
             Console.WriteLine($"sw.ElapsedMilliseconds: {sw.ElapsedMilliseconds}");
 
-            db.CloseConn();
-         }
+            DbContext.CloseConnection();
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Threading;
 using Confluent.Kafka;
 using ConsumerApp.Interfaces;
 
-namespace ConsumerApp.Services
+namespace ConsumerApp.Modules
 {
     public class SimpleConsumer : Consumer
     {
