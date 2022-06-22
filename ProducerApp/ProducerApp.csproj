@@ -12,7 +12,7 @@
     <PackageReference Include="Confluent.SchemaRegistry.Serdes.Json" Version="1.4.3" />
     <PackageReference Include="Lorem.NET" Version="1.0.6" />
     <PackageReference Include="NDesk.Options" Version="0.2.1" />
-    <PackageReference Include="newtonsoft.json" Version="12.0.3" />
+    <PackageReference Include="newtonsoft.json" Version="13.0.1" />
     <PackageReference Include="UniqueIdGenerator" Version="2.0.0" />
   </ItemGroup>
 
